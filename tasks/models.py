@@ -44,16 +44,8 @@ class Tasks(Model):
     def __str__(self):
         return self.title
 
-    # @property
-    # def get_users(self):
-    #     return self.author_set.all()
-
 
 class Subtasks(Model):
     name = CharField(max_length=200)
     is_completed = BooleanField(default=False)
     task = ForeignKey('Tasks', CASCADE, related_name='subtasks')
-
-# class AuthorTask(Model):
-#     author = ForeignKey('User', CASCADE)
-#     task = ForeignKey('Tasks', CASCADE)

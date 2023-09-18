@@ -8,6 +8,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveAPIView
 
 from root import settings
+from tasks.pagination import CustomPagination
+from tasks.response_json import CustomRenderer
 from users.models import User
 from users.serializers import PasswordResetConfirmSerializer, UserRegisterCashSerializer
 from users.serializers import (
@@ -81,6 +83,7 @@ class UserRetrieveAPIView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserRetrieveSerializer
     permission_classes = [IsAuthenticated]
+    renderer_classes = [CustomRenderer]
 
     def get_object(self):
         return self.request.user

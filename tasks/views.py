@@ -5,9 +5,11 @@ from rest_framework.response import Response
 from tasks.models import Board, Column, Tasks, Subtasks
 from tasks.pagination import CustomPagination
 from tasks.response_json import CustomRenderer
-from tasks.serializer import (BordModelSerializer, CreateBoardSerializer, ColumnModelSerializer, TaskSerializer)
+from tasks.serializer import (BordModelSerializer, CreateBoardSerializer, ColumnModelSerializer, TaskSerializer,
+                              SubtaskSerializer)
 
 
+# Board List
 class BoardListAPIView(ListAPIView):
     queryset = Board.objects.all()
     serializer_class = BordModelSerializer
@@ -15,12 +17,42 @@ class BoardListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
 
+# Column List
 class ColumnListAPIView(ListAPIView):
     queryset = Column.objects.all()
     serializer_class = ColumnModelSerializer
     renderer_classes = [CustomRenderer]
     pagination_class = CustomPagination
 
+
+# Get Columns with Board_id
+
+class BoardColumnListAPIView(ListAPIView):
+    queryset = Board.objects.all()
+    serializer_class = ColumnModelSerializer
+    renderer_classes = [CustomRenderer]
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        board_id = self.kwargs.get('board_id')
+        queryset = Column.objects.filter(board_id=board_id)
+        return queryset
+
+
+# Get Tasks with Column_id
+
+class TaskListByColumnAPIView(ListAPIView):
+    queryset = Tasks.objects.all()
+    serializer_class = TaskSerializer
+    renderer_classes = [CustomRenderer]
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        column_id = self.kwargs['column_id']
+        return Tasks.objects.filter(status__id=column_id)
+
+
+# Board and Column Create
 
 class BoardCreateAPIView(CreateAPIView):
     serializer_class = CreateBoardSerializer
@@ -36,33 +68,7 @@ class BoardCreateAPIView(CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-# Get Columns with Board_id
-
-class BoardColumnListAPIView(ListAPIView):
-    queryset = Board.objects.all()
-    serializer_class = ColumnModelSerializer
-    renderer_classes = [CustomRenderer]
-    pagination_class = CustomPagination
-
-    # Get columns from board ID
-    def get_queryset(self):
-        board_id = self.kwargs.get('board_id')
-        queryset = Column.objects.filter(board_id=board_id)
-        return queryset
-
-
-# Get Tasks with Column_id
-
-class TaskListByColumnAPIView(ListAPIView):
-    serializer_class = TaskSerializer
-    renderer_classes = [CustomRenderer]
-    pagination_class = CustomPagination
-
-    # Get tasks from column ID
-    def get_queryset(self):
-        column_id = self.kwargs['column_id']
-        return Tasks.objects.filter(status__id=column_id)
-
+# Task and Subtask Create
 
 class TaskCreateAPIView(CreateAPIView):
     serializer_class = TaskSerializer
@@ -85,5 +91,13 @@ class TaskCreateAPIView(CreateAPIView):
         for subtask_data in subtasks_data:
             Subtasks.objects.create(task=task, **subtask_data)
 
-        response_serializer = TaskSerializer(task)
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        response_data = {
+            'column_id': column_id,
+            'title': task.title,
+            'description': task.description,
+            'difficulty': task.difficulty,
+            'subtasks': SubtaskSerializer(task.subtasks, many=True).data
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+

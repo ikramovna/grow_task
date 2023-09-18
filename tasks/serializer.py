@@ -1,6 +1,5 @@
-from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, Serializer, CharField, ListField
 
 from tasks.models import Column, Board, Tasks, Subtasks
 
@@ -11,9 +10,9 @@ class ColumnModelSerializer(ModelSerializer):
         fields = ('name', 'board')
 
 
-class CreateBoardSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=150)
-    columns = serializers.ListField(child=serializers.CharField())
+class CreateBoardSerializer(Serializer):
+    name = CharField(max_length=150)
+    columns = ListField(child=CharField())
 
 
 class BordModelSerializer(ModelSerializer):
@@ -39,13 +38,13 @@ class BoardColumnSerializer(ModelSerializer):
         fields = ('id', 'column')
 
 
-class SubtaskSerializer(serializers.ModelSerializer):
+class SubtaskSerializer(ModelSerializer):
     class Meta:
         model = Subtasks
         fields = '__all__'
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(ModelSerializer):
     subtasks = SubtaskSerializer(many=True, read_only=True)
 
     class Meta:
@@ -53,7 +52,7 @@ class TaskSerializer(serializers.ModelSerializer):
         exclude = ('status',)
 
 
-class ColumnSerializer(serializers.ModelSerializer):
+class ColumnSerializer(ModelSerializer):
     tasks = TaskSerializer(many=True, read_only=True)
 
     class Meta:
