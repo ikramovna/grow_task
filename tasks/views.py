@@ -11,6 +11,14 @@ from tasks.serializer import (BordModelSerializer, CreateBoardSerializer, Column
 class BoardListAPIView(ListAPIView):
     queryset = Board.objects.all()
     serializer_class = BordModelSerializer
+    renderer_classes = [CustomRenderer]
+    pagination_class = CustomPagination
+
+class ColumnListAPIView(ListAPIView):
+    queryset = Column.objects.all()
+    serializer_class = ColumnModelSerializer
+    renderer_classes = [CustomRenderer]
+    pagination_class = CustomPagination
 
 
 class BoardCreateAPIView(CreateAPIView):
