@@ -6,7 +6,7 @@ from users.services.cache_function import setKey
 
 
 class ActivationEmail(BaseEmailMessage):
-    template_name = "email/activation.html"
+    template_name = "activation.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

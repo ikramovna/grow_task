@@ -17,9 +17,25 @@ class RegisterUserModelSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('password',)
+        fields = tuple(User.REQUIRED_FIELDS) + ('fullname', 'email', 'password')
 
-
+    # def check_password_macht(self, **kwargs):
+    #     if kwargs.get("password") != kwargs.get("re_password"):
+    #         raise serializers.ValidationError({"password_mismatch": 'error_messages.PASSWORD_MISMATCH_ERROR'})
+    #     return True
+    #
+    # def validate(self, attrs):
+    #     if self.check_password_macht(**attrs):
+    #         attrs.pop('re_password')
+    #         try:
+    #             user = User(**attrs)
+    #             validate_password(attrs.get('password'), user)
+    #         except django_exceptions.ValidationError as e:
+    #             serializer_error = serializers.as_serializer_error(e)
+    #             raise serializers.ValidationError(
+    #                 {"password": serializer_error[api_settings.NON_FIELD_ERRORS_KEY]}
+    #             )
+    #     return attrs
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -71,7 +87,7 @@ class SendEmailResetSerializer(serializers.Serializer):
 class UserListModelSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'is_active', 'created_at')
+        fields = ('id', 'email', 'fullname',  'is_active', 'created_at')
 
 
 class UserRetrieveSerializer(serializers.ModelSerializer):
@@ -79,7 +95,12 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id',
-            'full_name',
-            'email',
+            'email', 'fullname',
             'is_active', 'created_at'
         )
+
+
+class UserRegisterCashSerializer(serializers.Serializer):
+    full_name = serializers.CharField(max_length=150)
+    email = serializers.EmailField()
+    password = serializers.CharField(max_length=150)

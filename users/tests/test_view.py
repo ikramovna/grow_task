@@ -12,8 +12,9 @@ class TestActivationUserGenericAPIView:
     payload = dict(
 
         email="diordev@icloud.com",
+        username="diordev",
         password="b2002234",
-
+        re_password="b2002234",
     )
 
     urls = {

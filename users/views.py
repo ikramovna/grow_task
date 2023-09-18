@@ -1,3 +1,5 @@
+import random
+from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from rest_framework.response import Response
@@ -5,8 +7,9 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveAPIView
 
+from root import settings
 from users.models import User
-from users.serializers import PasswordResetConfirmSerializer
+from users.serializers import PasswordResetConfirmSerializer, UserRegisterCashSerializer
 from users.serializers import (
     RegisterUserModelSerializer,
     CheckActivationSerializer,
@@ -14,6 +17,7 @@ from users.serializers import (
     UserListModelSerializer,
     UserRetrieveSerializer
 )
+from users.services.cache_function import setKey, getKey
 
 
 class RegisterUserCreateAPIView(CreateAPIView):
@@ -80,3 +84,29 @@ class UserRetrieveAPIView(RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class UserRegisterCashCreateAPIView(CreateAPIView):
+    serializer_class = UserRegisterCashSerializer
+    parser_classes = (FormParser, MultiPartParser)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = dict(serializer.validated_data)
+        data["activate_code"] = random.randint(100000, 999999)
+        setKey(
+            key=data.get("email"),
+            value=[data],
+            timeout=10
+        )
+        send_mail(
+            subject="Subject here",
+            message=f"Sizning activatsiya ko'dingiz: "
+                    f"{data['activate_code']}",
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[data['email']]
+        )
+        print(getKey(key=serializer.validated_data.get("email")))
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
