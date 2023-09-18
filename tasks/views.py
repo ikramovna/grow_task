@@ -1,12 +1,12 @@
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 
 from tasks.models import Board, Column, Tasks, Subtasks
 from tasks.pagination import CustomPagination
 from tasks.response_json import CustomRenderer
 from tasks.serializer import (BordModelSerializer, CreateBoardSerializer, ColumnModelSerializer, TaskSerializer,
-                              SubtaskSerializer)
+                              SubtaskSerializer, BoardSerializer)
 
 
 # Board List
@@ -50,6 +50,13 @@ class TaskListByColumnAPIView(ListAPIView):
     def get_queryset(self):
         column_id = self.kwargs['column_id']
         return Tasks.objects.filter(status__id=column_id)
+
+
+class BoardDetailRetrieveAPIView(RetrieveAPIView):
+    queryset = Board.objects.all()
+    serializer_class = BoardSerializer
+    renderer_classes = [CustomRenderer]
+    lookup_field = 'id'
 
 
 # Board and Column Create
@@ -100,4 +107,3 @@ class TaskCreateAPIView(CreateAPIView):
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
-
