@@ -14,6 +14,7 @@ class BoardListAPIView(ListAPIView):
     renderer_classes = [CustomRenderer]
     pagination_class = CustomPagination
 
+
 class ColumnListAPIView(ListAPIView):
     queryset = Column.objects.all()
     serializer_class = ColumnModelSerializer
@@ -35,6 +36,8 @@ class BoardCreateAPIView(CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+# Get Columns with Board_id
+
 class BoardColumnListAPIView(ListAPIView):
     queryset = Board.objects.all()
     serializer_class = ColumnModelSerializer
@@ -47,6 +50,8 @@ class BoardColumnListAPIView(ListAPIView):
         queryset = Column.objects.filter(board_id=board_id)
         return queryset
 
+
+# Get Tasks with Column_id
 
 class TaskListByColumnAPIView(ListAPIView):
     serializer_class = TaskSerializer
