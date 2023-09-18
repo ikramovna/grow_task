@@ -46,7 +46,11 @@ class BaseManagerUser(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
+<<<<<<< HEAD
         return self._create_user(fullname, email, password, **extra_fields)
+=======
+        return self._create_user( email, password, **extra_fields)
+>>>>>>> origin/master
 
     def with_perm(
             self, perm, is_active=True, include_superusers=True, backend=None, obj=None

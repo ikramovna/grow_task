@@ -13,7 +13,6 @@ User = get_user_model()
 
 
 class RegisterUserModelSerializer(ModelSerializer):
-    # re_password = serializers.CharField(max_length=100, write_only=True)
     password = serializers.CharField(max_length=100, write_only=True)
 
     class Meta:
