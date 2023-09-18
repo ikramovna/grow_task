@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 
 from tasks.models import Board, Column, Tasks, Subtasks
@@ -63,6 +64,7 @@ class BoardDetailRetrieveAPIView(RetrieveAPIView):
 
 class BoardCreateAPIView(CreateAPIView):
     serializer_class = CreateBoardSerializer
+    parser_classes = (FormParser, MultiPartParser)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(request.data).data
@@ -79,6 +81,7 @@ class BoardCreateAPIView(CreateAPIView):
 
 class TaskCreateAPIView(CreateAPIView):
     serializer_class = TaskSerializer
+    parser_classes = (FormParser, MultiPartParser)
 
     def create(self, request, *args, **kwargs):
         column_id = request.data.get('column_id')

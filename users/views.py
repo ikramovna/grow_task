@@ -1,24 +1,19 @@
 import random
-from django.core.mail import send_mail
+
 from django.contrib.auth.hashers import make_password
+from django.core.mail import send_mail
 from rest_framework import status
-from rest_framework.response import Response
+from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveAPIView
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveAPIView
+from rest_framework.response import Response
 
 from root import settings
-from tasks.pagination import CustomPagination
 from tasks.response_json import CustomRenderer
 from users.models import User
 from users.serializers import PasswordResetConfirmSerializer, UserRegisterCashSerializer
-from users.serializers import (
-    RegisterUserModelSerializer,
-    CheckActivationSerializer,
-    SendEmailResetSerializer,
-    UserListModelSerializer,
-    UserRetrieveSerializer
-)
+from users.serializers import (RegisterUserModelSerializer, CheckActivationSerializer, SendEmailResetSerializer,
+                               UserListModelSerializer, UserRetrieveSerializer)
 from users.services.cache_function import setKey, getKey
 
 
