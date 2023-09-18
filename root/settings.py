@@ -14,6 +14,7 @@ ALLOWED_HOSTS = ['*']
 
 MY_APPS = [
     'tasks',
+    'users'
 ]
 
 THIRD_PARTY_APPS = [
@@ -64,14 +65,17 @@ WSGI_APPLICATION = 'root.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('POSTGRES_DB'),
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.getenv('POSTGRES_DB', BASE_DIR / 'db.sqlite3'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'),
+        'PORT': os.getenv('POSTGRES_PORT')
     }
 }
+
+AUTH_USER_MODEL = 'users.User'
+
 
 # AUTH_PASSWORD_VALIDATORS = [
 #     {
@@ -129,3 +133,13 @@ SWAGGER_SETTINGS = {
     }
 
 }
+
+
+
+# SMTP settings
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
