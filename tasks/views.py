@@ -1,13 +1,14 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.generics import (CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView)
+from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.response import Response
 
 from tasks.models import Board, Column, Tasks, Subtasks
 from tasks.pagination import CustomPagination
 from tasks.response_json import CustomRenderer
 from tasks.serializer import (BordModelSerializer, CreateBoardSerializer, ColumnModelSerializer, TaskSerializer,
-                              SubtaskSerializer, BoardSerializer)
+                              SubtaskSerializer, BoardSerializer, ColumnSerializer, TaskUpdateModelSerializer)
 
 
 # Board List
@@ -16,6 +17,20 @@ class BoardListAPIView(ListAPIView):
     serializer_class = BordModelSerializer
     renderer_classes = [CustomRenderer]
     pagination_class = CustomPagination
+
+
+# Board CRUD
+class BoardUpdateAPIViewDestroyAPIView(UpdateAPIView, DestroyAPIView):
+    queryset = Board.objects.all()
+    serializer_class = BordModelSerializer
+
+
+# Column CRUD
+class ColumnUpdateAPIViewDestroyAPIView(UpdateAPIView, DestroyAPIView):
+    queryset = Column.objects.all()
+    serializer_class = ColumnModelSerializer
+
+
 
 
 # Column List
@@ -53,6 +68,8 @@ class TaskListByColumnAPIView(ListAPIView):
         return Tasks.objects.filter(status__id=column_id)
 
 
+class CreateColumnCreateAPIView(CreateAPIView):
+    serializer_class = ColumnSerializer
 
 
 class BoardDetailRetrieveAPIView(RetrieveAPIView):
@@ -66,7 +83,7 @@ class BoardDetailRetrieveAPIView(RetrieveAPIView):
 
 class BoardCreateAPIView(CreateAPIView):
     serializer_class = CreateBoardSerializer
-    parser_classes = (FormParser, MultiPartParser)
+    parser_classes = (FormParser, MultiPartParser, JSONParser)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(request.data).data
@@ -83,7 +100,7 @@ class BoardCreateAPIView(CreateAPIView):
 
 class TaskCreateAPIView(CreateAPIView):
     serializer_class = TaskSerializer
-    parser_classes = (FormParser, MultiPartParser)
+    parser_classes = (FormParser, MultiPartParser, JSONParser)
 
     def create(self, request, *args, **kwargs):
         column_id = request.data.get('column_id')
@@ -112,3 +129,9 @@ class TaskCreateAPIView(CreateAPIView):
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+class TaskUpdateAPIView(UpdateAPIView):
+    queryset = Tasks.objects.all()
+    serializer_class = TaskUpdateModelSerializer
+    # http_method_names = ['put', 'patch']

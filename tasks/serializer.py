@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer, Serializer, CharField, ListField
 
@@ -7,7 +8,7 @@ from tasks.models import Column, Board, Tasks, Subtasks
 class ColumnModelSerializer(ModelSerializer):
     class Meta:
         model = Column
-        fields = ('id','name', 'board_id')
+        fields = ('id', 'name', 'board_id')
 
 
 class CreateBoardSerializer(Serializer):
@@ -18,7 +19,7 @@ class CreateBoardSerializer(Serializer):
 class BordModelSerializer(ModelSerializer):
     class Meta:
         model = Board
-        fields = ('id','name')
+        fields = ('id', 'name')
 
     # def to_representation(self, instance):
     #     rep = super().to_representation(instance)
@@ -42,6 +43,14 @@ class SubtaskSerializer(ModelSerializer):
     class Meta:
         model = Subtasks
         fields = '__all__'
+
+
+class TaskUpdateModelSerializer(ModelSerializer):
+    column_id = serializers.IntegerField()
+
+    class Meta:
+        model = Tasks
+        fields = ("id", "title", "description", "column_id")
 
 
 class TaskSerializer(ModelSerializer):
