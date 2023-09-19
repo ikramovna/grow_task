@@ -53,6 +53,8 @@ class TaskListByColumnAPIView(ListAPIView):
         return Tasks.objects.filter(status__id=column_id)
 
 
+
+
 class BoardDetailRetrieveAPIView(RetrieveAPIView):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer

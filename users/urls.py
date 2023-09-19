@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from users.views import (
     RegisterUserCreateAPIView, ActivationUserGenericAPIView, PasswordResetGenericAPIView,
@@ -7,6 +8,7 @@ from users.views import (
 app_name = 'users'
 
 urlpatterns = [
+    path('login', TokenObtainPairView.as_view(), name='login'),
     path('register', RegisterUserCreateAPIView.as_view(), name='register'),
     path('activate', ActivationUserGenericAPIView.as_view(), name='activated_account'),
     path('reset-password', PasswordResetGenericAPIView.as_view(), name='reset_password'),

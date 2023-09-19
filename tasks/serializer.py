@@ -7,7 +7,7 @@ from tasks.models import Column, Board, Tasks, Subtasks
 class ColumnModelSerializer(ModelSerializer):
     class Meta:
         model = Column
-        fields = ('name', 'board')
+        fields = ('id','name', 'board_id')
 
 
 class CreateBoardSerializer(Serializer):
@@ -18,12 +18,12 @@ class CreateBoardSerializer(Serializer):
 class BordModelSerializer(ModelSerializer):
     class Meta:
         model = Board
-        fields = ('name',)
+        fields = ('id','name')
 
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep["columns"] = instance.get_columns()
-        return rep
+    # def to_representation(self, instance):
+    #     rep = super().to_representation(instance)
+    #     rep["columns"] = instance.get_columns()
+    #     return rep
 
 
 class BoardColumnSerializer(ModelSerializer):
@@ -50,6 +50,16 @@ class TaskSerializer(ModelSerializer):
     class Meta:
         model = Tasks
         exclude = ('status',)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return {
+            "id": representation['id'],
+            "title": representation['title'],
+            "description": representation['description'],
+            "difficulty": representation['difficulty'],
+            "subtasks": representation['subtasks']
+        }
 
 
 class ColumnSerializer(ModelSerializer):

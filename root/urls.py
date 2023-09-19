@@ -1,6 +1,7 @@
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from root import settings
 from root.swagger import schema_view
@@ -11,8 +12,11 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
     path('admin/', admin.site.urls),
-    path('tasks/', include('tasks.urls')),
-    path('users/', include('users.urls', namespace='users'))
+    path('', include('tasks.urls')),
+    path('users/', include('users.urls', namespace='users')),
+
+    path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/verify', TokenVerifyView.as_view(), name='token_verify'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
