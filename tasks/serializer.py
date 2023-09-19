@@ -42,8 +42,7 @@ class BoardColumnSerializer(ModelSerializer):
 class SubtaskSerializer(ModelSerializer):
     class Meta:
         model = Subtasks
-        fields = '__all__'
-
+        fields = ('name',)
 
 class TaskUpdateModelSerializer(ModelSerializer):
     column_id = serializers.IntegerField()
