@@ -11,7 +11,7 @@ from users.services.upload_files import upload_name
 
 
 class BaseAbstractUser(AbstractBaseUser, PermissionsMixin):
-    fullname_validator = UnicodeUsernameValidator()
+    # fullname_validator = UnicodeUsernameValidator()
     email_validator = EmailValidator()
 
     email = EmailField(_("email"),
@@ -24,8 +24,8 @@ class BaseAbstractUser(AbstractBaseUser, PermissionsMixin):
     fullname = CharField(_("fullname"),
                          max_length=150,
                          unique=True,
-                         help_text=_("Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."),
-                         validators=[fullname_validator],
+                         help_text=_("Required. 150 characters or fewer."),
+                         # validators=[fullname_validator],
                          error_messages={"unique": _("A user with that fullname already exists.")},
                          )
 
