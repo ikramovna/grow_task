@@ -1,8 +1,6 @@
 import random
-
 from templated_mail.mail import BaseEmailMessage
-
-from users.services.cache_function import setKey
+from apps.users.services.cache_functions import setKey
 
 
 class ActivationEmail(BaseEmailMessage):
@@ -13,7 +11,8 @@ class ActivationEmail(BaseEmailMessage):
         context['activation_code'] = random.randint(100000, 999999)
 
         setKey(
-            key=context.get('user').email,
+            key=context.get('email'),
+
             value=context.get('activation_code'),
             timeout=None
         )
