@@ -78,7 +78,7 @@ class UserRetrieveAPIView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserRetrieveSerializer
     permission_classes = [IsAuthenticated]
-    renderer_classes = [CustomRenderer]
+    # renderer_classes = [CustomRenderer]
 
     def get_object(self):
         return self.request.user
