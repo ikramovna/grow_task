@@ -1,5 +1,7 @@
 from django.db.models import Model, CharField, TextField, ForeignKey, CASCADE, BooleanField, TextChoices
 
+from users.models import User
+
 
 class Board(Model):
     name = CharField(max_length=200)
@@ -34,7 +36,7 @@ class Tasks(Model):
     description = TextField(blank=True, null=True)
     difficulty = CharField(max_length=220, choices=TypeChoices.choices, default=TypeChoices.EASY)
 
-    status = ForeignKey('Column', CASCADE, related_name='tasks')
+    column = ForeignKey('Column', CASCADE, related_name='tasks')
 
     class Meta:
         db_table = 'tasks'
@@ -49,3 +51,8 @@ class Subtasks(Model):
     name = CharField(max_length=200)
     is_completed = BooleanField(default=False)
     task = ForeignKey('Tasks', CASCADE, related_name='subtasks')
+
+
+class AuthorTask(Model):
+    author = ForeignKey(User, CASCADE)
+    task = ForeignKey(Tasks, CASCADE)

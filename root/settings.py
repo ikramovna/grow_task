@@ -21,6 +21,7 @@ MY_APPS = [
 THIRD_PARTY_APPS = [
     'drf_yasg',
     'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 INSTALLED_APPS = [
@@ -230,3 +231,5 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with'
 ]
+
+REFRESH_TOKEN_SECRET = 'your_refresh_token_secret_key'

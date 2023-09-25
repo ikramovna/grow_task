@@ -42,7 +42,25 @@ class BoardColumnSerializer(ModelSerializer):
 class SubtaskSerializer(ModelSerializer):
     class Meta:
         model = Subtasks
-        fields = ('name',)
+        fields = ['name']
+
+
+class TaskSerializer(ModelSerializer):
+    subtasks = SubtaskSerializer(many=True, required=False)
+
+    class Meta:
+        model = Tasks
+        fields = ['column', 'title', 'description', 'difficulty', 'subtasks']
+
+    def create(self, validated_data):
+        subtasks_data = validated_data.pop('subtasks', [])
+        task = Tasks.objects.create(**validated_data)
+
+        for subtask_data in subtasks_data:
+            Subtasks.objects.create(task=task, **subtask_data)
+
+        return task
+
 
 class TaskUpdateModelSerializer(ModelSerializer):
     column_id = serializers.IntegerField()
@@ -50,24 +68,6 @@ class TaskUpdateModelSerializer(ModelSerializer):
     class Meta:
         model = Tasks
         fields = ("id", "title", "description", "column_id")
-
-
-class TaskSerializer(ModelSerializer):
-    subtasks = SubtaskSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Tasks
-        exclude = ('status',)
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        return {
-            "id": representation['id'],
-            "title": representation['title'],
-            "description": representation['description'],
-            "difficulty": representation['difficulty'],
-            "subtasks": representation['subtasks']
-        }
 
 
 class ColumnSerializer(ModelSerializer):
