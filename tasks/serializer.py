@@ -54,14 +54,13 @@ class TaskSerializer(ModelSerializer):
 
     def create(self, validated_data):
         subtasks_data = validated_data.pop('subtasks', [])
-        task = Tasks.objects.create(**validated_data)
+        column = validated_data.pop('column')
+        task = Tasks.objects.create(column=column, **validated_data)
 
         for subtask_data in subtasks_data:
             Subtasks.objects.create(task=task, **subtask_data)
 
         return task
-
-
 class TaskUpdateModelSerializer(ModelSerializer):
     column_id = serializers.IntegerField()
 

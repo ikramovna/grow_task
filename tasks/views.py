@@ -31,8 +31,6 @@ class ColumnUpdateAPIViewDestroyAPIView(UpdateAPIView, DestroyAPIView):
     serializer_class = ColumnModelSerializer
 
 
-
-
 # Column List
 class ColumnListAPIView(ListAPIView):
     queryset = Column.objects.all()
@@ -100,36 +98,21 @@ class BoardCreateAPIView(CreateAPIView):
 
 class TaskCreateAPIView(CreateAPIView):
     serializer_class = TaskSerializer
-    parser_classes = (FormParser, MultiPartParser, JSONParser)
 
     def create(self, request, *args, **kwargs):
-        column_id = request.data.get('column_id')
-
-        try:
-            column = Column.objects.get(id=column_id)
-        except Column.DoesNotExist:
-            return Response({"error": "Column does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-
-        task_serializer = self.get_serializer(data=request.data)
-        task_serializer.is_valid(raise_exception=True)
-
-        task = task_serializer.save(status=column)
-
-        # Create Subtasks
-        subtasks_data = request.data.get('subtasks', [])
-        for subtask_data in subtasks_data:
-            Subtasks.objects.create(task=task, **subtask_data)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        task = serializer.save()
 
         response_data = {
-            'column_id': column_id,
+            'column': task.column.id,
             'title': task.title,
             'description': task.description,
             'difficulty': task.difficulty,
-            'subtasks': SubtaskSerializer(task.subtasks, many=True).data
+            'subtasks': SubtaskSerializer(task.subtasks.all(), many=True).data
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
-
 
 class TaskUpdateAPIView(UpdateAPIView):
     queryset = Tasks.objects.all()
