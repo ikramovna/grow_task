@@ -1,14 +1,14 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView)
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.response import Response
 
-from tasks.models import Board, Column, Tasks, Subtasks
+from tasks.models import Board, Column, Tasks
 from tasks.pagination import CustomPagination
 from tasks.response_json import CustomRenderer
 from tasks.serializer import (BordModelSerializer, CreateBoardSerializer, ColumnModelSerializer, TaskSerializer,
-                              SubtaskSerializer, BoardSerializer, ColumnSerializer, TaskUpdateModelSerializer)
+                              SubtaskSerializer, BoardSerializer, ColumnSerializer, TaskUpdateModelSerializer,
+                              TaskCreateModelSerializer)
 
 
 # Board List
@@ -114,7 +114,13 @@ class TaskCreateAPIView(CreateAPIView):
 
         return Response(response_data, status=status.HTTP_201_CREATED)
 
-class TaskUpdateAPIView(UpdateAPIView):
+
+class TaskUpdateAPIView(UpdateAPIView, DestroyAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TaskUpdateModelSerializer
     # http_method_names = ['put', 'patch']
+
+
+class TaskCreateAPIVieww(CreateAPIView):
+    serializer_class = TaskCreateModelSerializer
+

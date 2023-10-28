@@ -3,10 +3,12 @@ from rest_framework import status
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
 from users.serializers import UserRegisterCashedModelSerializer, UserRetrieveUpdateDestroyModelSerializer, \
     CheckActivationCode, SendEmailResetSerializer, PasswordResetConfirmSerializer
+from users.services.cache_functions import getKey
 
 
 # Create your views here.
@@ -38,7 +40,15 @@ class CheckActivationCodeGenericAPIView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        data = serializer.data
+        user = getKey(key=data['email'])['user']
+        user.save()
+        token = RefreshToken.for_user(user)
+        response = {
+            "access": str(token.access_token),
+            'refresh': str(token),
+        }
+        return Response(response, status=status.HTTP_200_OK)
 
 
 

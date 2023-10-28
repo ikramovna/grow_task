@@ -2,7 +2,8 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer, Serializer, CharField, ListField
 
-from tasks.models import Column, Board, Tasks, Subtasks
+from tasks.models import Column, Board, Tasks, Subtasks, AuthorTask
+from users.models import User
 
 
 class ColumnModelSerializer(ModelSerializer):
@@ -61,6 +62,8 @@ class TaskSerializer(ModelSerializer):
             Subtasks.objects.create(task=task, **subtask_data)
 
         return task
+
+
 class TaskUpdateModelSerializer(ModelSerializer):
     column_id = serializers.IntegerField()
 
@@ -110,3 +113,35 @@ class BoardSerializer(ModelSerializer):
                 column_data['tasks'].append(task_data)
             columns_data.append(column_data)
         return columns_data
+
+
+class TaskCreateModelSerializer(serializers.ModelSerializer):
+    subtasks = serializers.ListField(write_only=True, required=False)
+    authors = serializers.ListField(write_only=True, required=False)
+
+    class Meta:
+        model = Tasks
+        fields = ('id', 'column', 'title', 'description',  'difficulty', 'subtasks', 'authors')
+
+    def to_representation(self, instance: Tasks):
+        rep = super().to_representation(instance)
+        rep['author'] = instance.authortask_set.values('author__username', 'author__email')
+        return rep
+
+    def create(self, validated_data):
+        subtasks_data = validated_data.pop('subtasks', [])
+        authors_data = validated_data.pop('authors', [])
+
+        task = Tasks.objects.create(**validated_data)
+
+        for subtask_name in subtasks_data:
+            Subtasks.objects.create(name=subtask_name, task=task)
+
+        author_task = []
+        for author_email in authors_data:
+            if User.objects.filter(email=author_email).exists():
+                user = User.objects.filter(email=author_email).first()
+                author_task.append(AuthorTask(task=task, author=user))
+        AuthorTask.objects.bulk_create(author_task)
+
+        return task

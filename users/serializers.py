@@ -36,16 +36,20 @@ class UserRegisterCashedModelSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         activate_code = random.randint(100000, 999999)
+        user = User(
+            fullname=attrs['fullname'],
+            email=attrs['email'],
+            username=attrs['username'],
+            password=make_password(attrs['password']),
+            is_active=True,
+        )
         setKey(
             key=attrs['email'],
             value={
-                "fullname": attrs['fullname'],
-                "email": attrs['email'],
-                "username": attrs['username'],
-                "password": attrs['password'],
+                "user": user,
                 "activate_code": activate_code
             },
-            timeout=None
+            timeout=300
         )
         print(getKey(key=attrs['email']))
         send_mail(
@@ -56,7 +60,6 @@ class UserRegisterCashedModelSerializer(serializers.ModelSerializer):
             fail_silently=False,
         )
         return super().validate(attrs)
-
 
 class UserRetrieveUpdateDestroyModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -77,22 +80,13 @@ class UserRetrieveUpdateDestroyModelSerializer(serializers.ModelSerializer):
 
 
 class CheckActivationCode(serializers.Serializer):
-    email = serializers.EmailField(write_only=True)
+    email = serializers.EmailField()
     activate_code = serializers.IntegerField(write_only=True)
 
     def validate(self, attrs):
         data = getKey(key=attrs['email'])
         print(data)
         if data and data['activate_code'] == attrs['activate_code']:
-            user = User.objects.create(
-                fullname=data['fullname'],
-                email=data['email'],
-                username=data['username'],
-                password=make_password(data['password']),
-                is_active=True,
-            )
-            user.save()
-            deleteKey(key=attrs['email'])
             return attrs
         raise serializers.ValidationError(
             {"error": "Error activate code or email"}

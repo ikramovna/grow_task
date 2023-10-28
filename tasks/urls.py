@@ -3,7 +3,7 @@ from django.urls import path
 from tasks.views import (BoardListAPIView, BoardCreateAPIView, BoardColumnListAPIView, TaskCreateAPIView,
                          TaskListByColumnAPIView, ColumnListAPIView, BoardDetailRetrieveAPIView,
                          CreateColumnCreateAPIView, BoardUpdateAPIViewDestroyAPIView, ColumnUpdateAPIViewDestroyAPIView,
-                         TaskUpdateAPIView)
+                         TaskUpdateAPIView, TaskCreateAPIVieww)
 
 urlpatterns = [
     path('board/list', BoardListAPIView.as_view(), name='board'),
@@ -20,4 +20,5 @@ urlpatterns = [
     path('task/<int:column_id>', TaskListByColumnAPIView.as_view(), name='tasks'),
     path('task/<int:id>', TaskUpdateAPIView.as_view(), name='tasks-update'),
 
+    path('task_create', TaskCreateAPIVieww.as_view(), name='task_create'),
 ]
